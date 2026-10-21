@@ -132,6 +132,41 @@ export interface StatsOverview {
   offers: number;
 }
 
+/** 投递状态分布项 */
+export interface StatusDistributionItem {
+  status: ApplicationStatus;
+  count: number;
+}
+
+/** 投递渠道分布项 */
+export interface ChannelDistributionItem {
+  channel: string;
+  count: number;
+}
+
+/** 投递周趋势项（weekStart 为该周周一的 YYYY-MM-DD） */
+export interface WeeklyTrendItem {
+  weekStart: string;
+  count: number;
+}
+
+/** 转化漏斗（投递 → 笔试 → 面试 → Offer） */
+export interface FunnelData {
+  applied: number;
+  writtenTest: number;
+  interview: number;
+  offer: number;
+}
+
+/** 统计看板聚合结果（一次 IPC 返回全部图表所需数据） */
+export interface StatsDashboard {
+  overview: StatsOverview;
+  statusDistribution: StatusDistributionItem[];
+  channelDistribution: ChannelDistributionItem[];
+  weeklyTrend: WeeklyTrendItem[];
+  funnel: FunnelData;
+}
+
 /** 系统备份记录（渲染层列表展示用） */
 export interface BackupRecord {
   id: number;

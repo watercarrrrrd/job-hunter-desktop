@@ -15,6 +15,7 @@ import type {
   InterviewChecklist,
   InterviewResult,
   Resume,
+  StatsDashboard,
   StatsOverview,
   UpdateApplicationInput,
   UpdateChecklistInput,
@@ -81,6 +82,8 @@ const api = {
 
   stats: {
     overview: (): Promise<ApiResult<StatsOverview>> => ipcRenderer.invoke(IPC.Stats.Overview),
+    dashboard: (): Promise<ApiResult<StatsDashboard>> =>
+      ipcRenderer.invoke(IPC.Stats.Dashboard),
   },
 
   backup: {

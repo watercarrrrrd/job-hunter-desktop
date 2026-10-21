@@ -33,6 +33,7 @@ export const IPC = {
   },
   Stats: {
     Overview: 'stats:overview',
+    Dashboard: 'stats:dashboard',
   },
   Backup: {
     Export: 'backup:export',
