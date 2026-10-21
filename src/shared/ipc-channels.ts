@@ -38,6 +38,7 @@ export const IPC = {
   Backup: {
     Export: 'backup:export',
     Import: 'backup:import',
+    Preview: 'backup:preview',
     List: 'backup:list',
   },
   File: {

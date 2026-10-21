@@ -185,6 +185,16 @@ export interface BackupExportResult {
   size: number;
 }
 
+/** 备份导入预览（导入前展示概要，供用户二次确认） */
+export interface BackupPreview {
+  path: string;
+  backupAt: string;
+  resumeCount: number;
+  applicationCount: number;
+  interviewCount: number;
+  checklistCount: number;
+}
+
 /** 备份导入结果 */
 export interface BackupImportResult {
   dataCount: number;

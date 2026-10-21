@@ -6,6 +6,7 @@ import type {
   ApplicationStatus,
   BackupExportResult,
   BackupImportResult,
+  BackupPreview,
   BackupRecord,
   CreateApplicationInput,
   CreateChecklistInput,
@@ -88,9 +89,11 @@ const api = {
 
   backup: {
     list: (): Promise<ApiResult<BackupRecord[]>> => ipcRenderer.invoke(IPC.Backup.List),
-    exportBackup: (): Promise<ApiResult<BackupExportResult>> =>
+    exportBackup: (): Promise<ApiResult<BackupExportResult | null>> =>
       ipcRenderer.invoke(IPC.Backup.Export),
-    importBackup: (): Promise<ApiResult<BackupImportResult>> =>
+    previewImport: (): Promise<ApiResult<BackupPreview | null>> =>
+      ipcRenderer.invoke(IPC.Backup.Preview),
+    confirmImport: (): Promise<ApiResult<BackupImportResult>> =>
       ipcRenderer.invoke(IPC.Backup.Import),
   },
 
