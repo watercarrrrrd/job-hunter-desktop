@@ -2,6 +2,37 @@
 
 export const IPC = {
   Ping: 'app:ping',
+  Resume: {
+    List: 'resume:list',
+    Get: 'resume:get',
+    Create: 'resume:create',
+    Update: 'resume:update',
+    Delete: 'resume:delete',
+  },
+  Application: {
+    List: 'application:list',
+    Get: 'application:get',
+    Create: 'application:create',
+    Update: 'application:update',
+    UpdateStatus: 'application:update-status',
+    Delete: 'application:delete',
+  },
+  Interview: {
+    List: 'interview:list',
+    Get: 'interview:get',
+    Create: 'interview:create',
+    Update: 'interview:update',
+    UpdateResult: 'interview:update-result',
+    Delete: 'interview:delete',
+  },
+  Stats: {
+    Overview: 'stats:overview',
+  },
+  Backup: {
+    Export: 'backup:export',
+    Import: 'backup:import',
+    List: 'backup:list',
+  },
 } as const;
 
 export interface PingResult {

@@ -132,5 +132,102 @@ export interface StatsOverview {
   offers: number;
 }
 
+/** 系统备份记录（渲染层列表展示用） */
+export interface BackupRecord {
+  id: number;
+  backupPath: string;
+  backupAt: string;
+  type: 'manual' | 'auto';
+  dataCount: number;
+  size: number;
+}
+
+/** 备份导出结果 */
+export interface BackupExportResult {
+  path: string;
+  backupAt: string;
+  dataCount: number;
+  size: number;
+}
+
+/** 备份导入结果 */
+export interface BackupImportResult {
+  dataCount: number;
+  importedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// 业务层输入 DTO（渲染层表单与主进程 service 共用）
+// ---------------------------------------------------------------------------
+
+export interface CreateResumeInput {
+  name: string;
+  templateId: ResumeTemplateId;
+  content: ResumeContent;
+}
+
+export interface UpdateResumeInput {
+  id: number;
+  name?: string;
+  templateId?: ResumeTemplateId;
+  content?: ResumeContent;
+}
+
+export interface CreateApplicationInput {
+  company: string;
+  position: string;
+  appliedDate?: string | null;
+  channel?: string | null;
+  resumeId?: number | null;
+  status?: ApplicationStatus;
+  jdLink?: string | null;
+  note?: string | null;
+}
+
+export interface UpdateApplicationInput {
+  id: number;
+  company?: string;
+  position?: string;
+  appliedDate?: string | null;
+  channel?: string | null;
+  resumeId?: number | null;
+  status?: ApplicationStatus;
+  jdLink?: string | null;
+  note?: string | null;
+}
+
+export interface CreateInterviewInput {
+  applicationId: number;
+  round?: string | null;
+  type?: string | null;
+  scheduledAt?: string | null;
+  location?: string | null;
+  interviewer?: string | null;
+  note?: string | null;
+  result?: InterviewResult;
+  review?: string | null;
+}
+
+export interface UpdateInterviewInput {
+  id: number;
+  round?: string | null;
+  type?: string | null;
+  scheduledAt?: string | null;
+  location?: string | null;
+  interviewer?: string | null;
+  note?: string | null;
+  review?: string | null;
+}
+
+export interface UpdateInterviewResultInput {
+  id: number;
+  result: InterviewResult;
+  review?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// 统一返回结构
+// ---------------------------------------------------------------------------
+
 /** 业务层统一返回结构 */
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string };

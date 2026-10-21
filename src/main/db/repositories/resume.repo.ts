@@ -1,5 +1,11 @@
 import Database from 'better-sqlite3';
-import type { Resume, ResumeContent, ResumeTemplateId } from '@shared/types';
+import type {
+  CreateResumeInput,
+  Resume,
+  ResumeContent,
+  ResumeTemplateId,
+  UpdateResumeInput,
+} from '@shared/types';
 
 interface ResumeRow {
   id: number;
@@ -19,12 +25,6 @@ function toResume(row: ResumeRow): Resume {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
-}
-
-export interface CreateResumeInput {
-  name: string;
-  templateId: ResumeTemplateId;
-  content: ResumeContent;
 }
 
 export function listResumes(db: Database.Database): Resume[] {
@@ -50,4 +50,33 @@ export function createResume(db: Database.Database, input: CreateResumeInput): R
     now,
   });
   return getResume(db, Number(info.lastInsertRowid)) as Resume;
+}
+
+export function updateResume(db: Database.Database, input: UpdateResumeInput): Resume | null {
+  const existing = getResume(db, input.id);
+  if (!existing) return null;
+
+  const name = input.name ?? existing.name;
+  const templateId = input.templateId ?? existing.templateId;
+  const content = input.content ?? existing.content;
+  const now = new Date().toISOString();
+
+  db.prepare(
+    `UPDATE resumes
+     SET name = @name, template_id = @templateId, content = @content, updated_at = @now
+     WHERE id = @id`,
+  ).run({
+    id: input.id,
+    name,
+    templateId,
+    content: JSON.stringify(content),
+    now,
+  });
+
+  return getResume(db, input.id);
+}
+
+export function deleteResume(db: Database.Database, id: number): boolean {
+  const info = db.prepare('DELETE FROM resumes WHERE id = ?').run(id);
+  return info.changes > 0;
 }

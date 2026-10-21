@@ -44,3 +44,21 @@ export const RESUME_TEMPLATE_LABELS: Record<ResumeTemplateId, string> = {
 export const APPLICATION_CHANNELS = ['官网', '招聘平台', '内推', '其他'] as const;
 export const INTERVIEW_ROUNDS = ['一面', '二面', '三面', 'HR面', '终面'] as const;
 export const INTERVIEW_TYPES = ['线上', '线下', '电话'] as const;
+
+/** 状态标签配色基调 */
+export type TagTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+
+export const APPLICATION_STATUS_TONES: Record<ApplicationStatus, TagTone> = {
+  applied: 'info',
+  written_test: 'warning',
+  interviewing: 'warning',
+  offered: 'success',
+  rejected: 'danger',
+  withdrawn: 'neutral',
+};
+
+export const INTERVIEW_RESULT_TONES: Record<InterviewResult, TagTone> = {
+  pending: 'warning',
+  passed: 'success',
+  failed: 'danger',
+};

@@ -1,5 +1,10 @@
 import { app, ipcMain } from 'electron';
 import { IPC, type PingResult } from '@shared/ipc-channels';
+import { registerResumeHandlers } from './resume.handler';
+import { registerApplicationHandlers } from './application.handler';
+import { registerInterviewHandlers } from './interview.handler';
+import { registerStatsHandlers } from './stats.handler';
+import { registerBackupHandlers } from './backup.handler';
 
 /**
  * 统一注册 IPC handler。
@@ -14,4 +19,10 @@ export function registerIpcHandlers(): void {
       time: new Date().toISOString(),
     };
   });
+
+  registerResumeHandlers();
+  registerApplicationHandlers();
+  registerInterviewHandlers();
+  registerStatsHandlers();
+  registerBackupHandlers();
 }

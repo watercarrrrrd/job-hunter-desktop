@@ -1,5 +1,10 @@
 import Database from 'better-sqlite3';
-import type { Interview, InterviewResult } from '@shared/types';
+import type {
+  CreateInterviewInput,
+  Interview,
+  InterviewResult,
+  UpdateInterviewInput,
+} from '@shared/types';
 
 interface InterviewRow {
   id: number;
@@ -31,18 +36,6 @@ function toInterview(row: InterviewRow): Interview {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
-}
-
-export interface CreateInterviewInput {
-  applicationId: number;
-  round?: string | null;
-  type?: string | null;
-  scheduledAt?: string | null;
-  location?: string | null;
-  interviewer?: string | null;
-  note?: string | null;
-  result?: InterviewResult;
-  review?: string | null;
 }
 
 export function listInterviews(db: Database.Database): Interview[] {
@@ -80,4 +73,63 @@ export function createInterview(db: Database.Database, input: CreateInterviewInp
     now,
   });
   return getInterview(db, Number(info.lastInsertRowid)) as Interview;
+}
+
+export function updateInterview(
+  db: Database.Database,
+  input: UpdateInterviewInput,
+): Interview | null {
+  const existing = getInterview(db, input.id);
+  if (!existing) return null;
+
+  const merged = {
+    round: input.round !== undefined ? input.round : existing.round,
+    type: input.type !== undefined ? input.type : existing.type,
+    scheduledAt: input.scheduledAt !== undefined ? input.scheduledAt : existing.scheduledAt,
+    location: input.location !== undefined ? input.location : existing.location,
+    interviewer: input.interviewer !== undefined ? input.interviewer : existing.interviewer,
+    note: input.note !== undefined ? input.note : existing.note,
+    review: input.review !== undefined ? input.review : existing.review,
+  };
+  const now = new Date().toISOString();
+
+  db.prepare(
+    `UPDATE interviews
+     SET round = @round, type = @type, scheduled_at = @scheduledAt, location = @location,
+         interviewer = @interviewer, note = @note, review = @review, updated_at = @now
+     WHERE id = @id`,
+  ).run({
+    id: input.id,
+    ...merged,
+    now,
+  });
+
+  return getInterview(db, input.id);
+}
+
+export function updateInterviewResult(
+  db: Database.Database,
+  id: number,
+  result: InterviewResult,
+  review?: string | null,
+): Interview | null {
+  const existing = getInterview(db, id);
+  if (!existing) return null;
+
+  const now = new Date().toISOString();
+  db.prepare(
+    'UPDATE interviews SET result = @result, review = @review, updated_at = @now WHERE id = @id',
+  ).run({
+    id,
+    result,
+    review: review !== undefined ? review : existing.review,
+    now,
+  });
+
+  return getInterview(db, id);
+}
+
+export function deleteInterview(db: Database.Database, id: number): boolean {
+  const info = db.prepare('DELETE FROM interviews WHERE id = ?').run(id);
+  return info.changes > 0;
 }
