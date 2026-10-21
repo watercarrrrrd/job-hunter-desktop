@@ -77,6 +77,11 @@ const api = {
     importBackup: (): Promise<ApiResult<BackupImportResult>> =>
       ipcRenderer.invoke(IPC.Backup.Import),
   },
+
+  file: {
+    savePdf: (fileName: string, base64: string): Promise<ApiResult<string | null>> =>
+      ipcRenderer.invoke(IPC.File.SavePdf, fileName, base64),
+  },
 };
 
 contextBridge.exposeInMainWorld('api', api);

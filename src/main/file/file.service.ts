@@ -15,6 +15,15 @@ export async function chooseSavePath(defaultName: string): Promise<string | null
   return result.canceled || !result.filePath ? null : result.filePath;
 }
 
+/** 弹出「另存为 PDF」对话框，返回用户选择的绝对路径；取消返回 null */
+export async function choosePdfSavePath(defaultName: string): Promise<string | null> {
+  const result = await dialog.showSaveDialog({
+    defaultPath: defaultName,
+    filters: [{ name: 'PDF 文件', extensions: ['pdf'] }],
+  });
+  return result.canceled || !result.filePath ? null : result.filePath;
+}
+
 /** 弹出「打开文件」对话框，返回用户选择的绝对路径；取消返回 null */
 export async function chooseOpenPath(): Promise<string | null> {
   const result = await dialog.showOpenDialog({
@@ -26,6 +35,10 @@ export async function chooseOpenPath(): Promise<string | null> {
 
 export function writeTextFile(path: string, content: string): void {
   writeFileSync(path, content, 'utf-8');
+}
+
+export function writeBinaryFile(path: string, data: Buffer): void {
+  writeFileSync(path, data);
 }
 
 export function readTextFile(path: string): string {

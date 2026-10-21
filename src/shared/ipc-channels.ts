@@ -33,6 +33,9 @@ export const IPC = {
     Import: 'backup:import',
     List: 'backup:list',
   },
+  File: {
+    SavePdf: 'file:save-pdf',
+  },
 } as const;
 
 export interface PingResult {
