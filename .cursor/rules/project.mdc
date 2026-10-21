@@ -1,0 +1,38 @@
+---
+description: JobHunter 项目级开发规范，约束数据层、业务层与 React 组件的代码实现
+alwaysApply: true
+---
+
+# JobHunter 项目级开发规范
+
+## 一、数据层代码规则
+
+适用路径：`src/main/db/**`（含 `repositories/`、`schema.sql`、`migrations.ts`）
+
+- 禁止直接拼接 SQL 字符串（含模板字符串插值）；一律使用 better-sqlite3 的 `prepare()` 预编译语句 + 参数绑定，防止注入与语法错误。
+- 所有数据访问必须封装为 repository 函数；禁止在 service、ipc、renderer 中直接编写或执行 SQL。
+- 表结构变更必须同步更新 `schema.sql` 并在 `migrations.ts` 中追加对应版本迁移，禁止只改代码不改迁移。
+- 统一错误处理：repository 不得吞掉异常，须抛出或返回统一结构的错误，交由 service 层统一捕获与转换。
+- 涉及多表写入的操作必须使用 `db.transaction()` 保证原子性。
+- repository 函数返回领域对象（来自 `src/shared/types.ts`），不返回原始 sqlite 行对象。
+
+## 二、业务层代码规则
+
+适用路径：`src/main/service/**`
+
+- service 是唯一允许调用 repository 的层；UI 层（renderer）禁止直接或间接调用数据库。
+- 业务校验（字段合法性、状态流转合法性、关联完整性）必须写在 service，不得下沉到 UI 或遗漏。
+- 跨表业务（如"面试结果回写投递状态"）必须在 service 内用事务完成，保证一致性。
+- 统一返回结构：所有 service 方法返回统一的成功/失败结果对象（如 `{ ok: true, data }` / `{ ok: false, error }`），供 IPC 层透传。
+- service 不得引入 React、DOM 等渲染进程依赖，保持主进程纯逻辑、可测试。
+
+## 三、React 组件规则
+
+适用路径：`src/renderer/src/pages/**`、`src/renderer/src/components/**`
+
+- 只允许编写函数式组件 + Hooks，禁止 class 组件。
+- 组件只负责渲染与用户交互；数据获取、副作用、派生状态抽离到 `src/renderer/src/hooks/`，禁止在组件内写复杂业务逻辑。
+- 通过 `src/renderer/src/lib/api.ts` 调用 `window.api` 访问系统能力；禁止直接使用 `window.require`、`process`、Node API 或绕过 preload。
+- 组件 props 必须用 `interface` 显式定义类型，禁止 `any`。
+- 可复用的通用控件下沉到 `components/`，页面组件通过组合而非复制实现。
+- 图表渲染统一经 `src/renderer/src/lib/echarts.ts` 按需注册，禁止页面内重复初始化 ECharts 实例。

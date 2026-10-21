@@ -1,0 +1,29 @@
+appId: com.jobhunter.app
+productName: JobHunter
+directories:
+  buildResources: resources
+  output: dist
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!.cursor/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.gitignore,.prettierignore,.prettierrc,eslint.config.mjs,PRD.md,TECH_DESIGN.md,AGENTS.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml,package-lock.json}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json,tailwind.config.js,postcss.config.js}'
+asarUnpack:
+  - '**/*.node'
+npmRebuild: true
+win:
+  sign: null
+  signAndEditExecutable: false
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${name}-${version}-setup.${ext}
+mac:
+  target:
+    - dmg
+  category: public.app-category.productivity
