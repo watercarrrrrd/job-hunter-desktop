@@ -18,6 +18,7 @@ import type {
   Resume,
   StatsDashboard,
   StatsOverview,
+  SystemInfo,
   UpdateApplicationInput,
   UpdateChecklistInput,
   UpdateInterviewInput,
@@ -100,6 +101,10 @@ const api = {
   file: {
     savePdf: (fileName: string, base64: string): Promise<ApiResult<string | null>> =>
       ipcRenderer.invoke(IPC.File.SavePdf, fileName, base64),
+  },
+
+  settings: {
+    info: (): Promise<ApiResult<SystemInfo>> => ipcRenderer.invoke(IPC.Settings.Info),
   },
 };
 

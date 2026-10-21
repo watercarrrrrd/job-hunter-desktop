@@ -44,6 +44,9 @@ export const IPC = {
   File: {
     SavePdf: 'file:save-pdf',
   },
+  Settings: {
+    Info: 'settings:info',
+  },
 } as const;
 
 export interface PingResult {

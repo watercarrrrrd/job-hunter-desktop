@@ -6,6 +6,7 @@ import { registerInterviewHandlers } from './interview.handler';
 import { registerStatsHandlers } from './stats.handler';
 import { registerBackupHandlers } from './backup.handler';
 import { registerFileHandlers } from './file.handler';
+import { registerSettingsHandlers } from './settings.handler';
 
 /**
  * 统一注册 IPC handler。
@@ -27,4 +28,5 @@ export function registerIpcHandlers(): void {
   registerStatsHandlers();
   registerBackupHandlers();
   registerFileHandlers();
+  registerSettingsHandlers();
 }

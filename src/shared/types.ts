@@ -201,6 +201,15 @@ export interface BackupImportResult {
   importedAt: string;
 }
 
+/** 系统设置信息（只读，供设置页展示） */
+export interface SystemInfo {
+  appName: string;
+  appVersion: string;
+  electronVersion: string;
+  dbPath: string;
+  description: string;
+}
+
 // ---------------------------------------------------------------------------
 // 业务层输入 DTO（渲染层表单与主进程 service 共用）
 // ---------------------------------------------------------------------------
