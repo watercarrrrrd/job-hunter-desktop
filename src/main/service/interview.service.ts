@@ -2,9 +2,12 @@ import { INTERVIEW_RESULTS } from '@shared/constants';
 import type {
   ApiResult,
   ApplicationStatus,
+  CreateChecklistInput,
   CreateInterviewInput,
   Interview,
+  InterviewChecklist,
   InterviewResult,
+  UpdateChecklistInput,
   UpdateInterviewInput,
 } from '@shared/types';
 import { getDb } from '../db';
@@ -79,4 +82,34 @@ export function updateInterviewResult(
 
 export function deleteInterview(id: number): ApiResult<boolean> {
   return runSafely(() => interviewRepo.deleteInterview(getDb(), id));
+}
+
+export function listChecklist(interviewId: number): ApiResult<InterviewChecklist[]> {
+  return runSafely(() => interviewRepo.listChecklist(getDb(), interviewId));
+}
+
+export function createChecklist(input: CreateChecklistInput): ApiResult<InterviewChecklist> {
+  if (!input.content.trim()) return fail('准备事项内容不能为空');
+  return runSafely(() => {
+    const db = getDb();
+    if (!interviewRepo.getInterview(db, input.interviewId)) {
+      throw new Error('关联的面试记录不存在');
+    }
+    return interviewRepo.createChecklist(db, input);
+  });
+}
+
+export function updateChecklist(input: UpdateChecklistInput): ApiResult<InterviewChecklist> {
+  if (input.content !== undefined && !input.content.trim()) {
+    return fail('准备事项内容不能为空');
+  }
+  return runSafely(() => {
+    const updated = interviewRepo.updateChecklist(getDb(), input);
+    if (!updated) throw new Error('准备事项不存在或已被删除');
+    return updated;
+  });
+}
+
+export function deleteChecklist(id: number): ApiResult<boolean> {
+  return runSafely(() => interviewRepo.deleteChecklist(getDb(), id));
 }

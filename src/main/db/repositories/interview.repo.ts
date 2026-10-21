@@ -1,8 +1,11 @@
 import Database from 'better-sqlite3';
 import type {
+  CreateChecklistInput,
   CreateInterviewInput,
   Interview,
+  InterviewChecklist,
   InterviewResult,
+  UpdateChecklistInput,
   UpdateInterviewInput,
 } from '@shared/types';
 
@@ -131,5 +134,86 @@ export function updateInterviewResult(
 
 export function deleteInterview(db: Database.Database, id: number): boolean {
   const info = db.prepare('DELETE FROM interviews WHERE id = ?').run(id);
+  return info.changes > 0;
+}
+
+interface ChecklistRow {
+  id: number;
+  interview_id: number;
+  content: string;
+  done: number;
+  sort_order: number;
+}
+
+function toChecklist(row: ChecklistRow): InterviewChecklist {
+  return {
+    id: row.id,
+    interviewId: row.interview_id,
+    content: row.content,
+    done: row.done === 1,
+    sortOrder: row.sort_order,
+  };
+}
+
+export function listChecklist(
+  db: Database.Database,
+  interviewId: number,
+): InterviewChecklist[] {
+  const rows = db
+    .prepare(
+      'SELECT * FROM interview_checklists WHERE interview_id = ? ORDER BY sort_order ASC, id ASC',
+    )
+    .all(interviewId) as ChecklistRow[];
+  return rows.map(toChecklist);
+}
+
+export function createChecklist(
+  db: Database.Database,
+  input: CreateChecklistInput,
+): InterviewChecklist {
+  const maxRow = db
+    .prepare(
+      'SELECT COALESCE(MAX(sort_order), -1) AS max_order FROM interview_checklists WHERE interview_id = ?',
+    )
+    .get(input.interviewId) as { max_order: number };
+  const sortOrder = maxRow.max_order + 1;
+
+  const info = db
+    .prepare(
+      'INSERT INTO interview_checklists (interview_id, content, done, sort_order) VALUES (@interviewId, @content, 0, @sortOrder)',
+    )
+    .run({ interviewId: input.interviewId, content: input.content, sortOrder });
+  return getChecklist(db, Number(info.lastInsertRowid)) as InterviewChecklist;
+}
+
+export function getChecklist(db: Database.Database, id: number): InterviewChecklist | null {
+  const row = db
+    .prepare('SELECT * FROM interview_checklists WHERE id = ?')
+    .get(id) as ChecklistRow | undefined;
+  return row ? toChecklist(row) : null;
+}
+
+export function updateChecklist(
+  db: Database.Database,
+  input: UpdateChecklistInput,
+): InterviewChecklist | null {
+  const existing = getChecklist(db, input.id);
+  if (!existing) return null;
+
+  const merged = {
+    content: input.content ?? existing.content,
+    done: input.done !== undefined ? (input.done ? 1 : 0) : existing.done ? 1 : 0,
+    sortOrder: input.sortOrder ?? existing.sortOrder,
+  };
+
+  db.prepare(
+    'UPDATE interview_checklists SET content = @content, done = @done, sort_order = @sortOrder WHERE id = @id',
+  ).run({ id: input.id, ...merged });
+
+  return getChecklist(db, input.id);
+}
+
+export function deleteChecklist(db: Database.Database, id: number): boolean {
+  const info = db.prepare('DELETE FROM interview_checklists WHERE id = ?').run(id);
   return info.changes > 0;
 }

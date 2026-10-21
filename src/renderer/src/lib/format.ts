@@ -9,3 +9,21 @@ export function formatDate(iso: string | null | undefined): string {
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 }
+
+/** 格式化为 YYYY-MM-DD HH:mm */
+export function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '-';
+  return `${formatDate(iso)} ${formatTime(iso)}`;
+}
+
+/** 格式化为 HH:mm */
+export function formatTime(iso: string | null | undefined): string {
+  if (!iso) return '--:--';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '--:--';
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
+}

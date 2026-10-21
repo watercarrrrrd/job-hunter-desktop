@@ -8,13 +8,16 @@ import type {
   BackupImportResult,
   BackupRecord,
   CreateApplicationInput,
+  CreateChecklistInput,
   CreateInterviewInput,
   CreateResumeInput,
   Interview,
+  InterviewChecklist,
   InterviewResult,
   Resume,
   StatsOverview,
   UpdateApplicationInput,
+  UpdateChecklistInput,
   UpdateInterviewInput,
   UpdateResumeInput,
 } from '@shared/types';
@@ -64,6 +67,16 @@ const api = {
       ipcRenderer.invoke(IPC.Interview.UpdateResult, id, result, review),
     remove: (id: number): Promise<ApiResult<boolean>> =>
       ipcRenderer.invoke(IPC.Interview.Delete, id),
+    checklist: {
+      list: (interviewId: number): Promise<ApiResult<InterviewChecklist[]>> =>
+        ipcRenderer.invoke(IPC.Interview.Checklist.List, interviewId),
+      create: (input: CreateChecklistInput): Promise<ApiResult<InterviewChecklist>> =>
+        ipcRenderer.invoke(IPC.Interview.Checklist.Create, input),
+      update: (input: UpdateChecklistInput): Promise<ApiResult<InterviewChecklist>> =>
+        ipcRenderer.invoke(IPC.Interview.Checklist.Update, input),
+      remove: (id: number): Promise<ApiResult<boolean>> =>
+        ipcRenderer.invoke(IPC.Interview.Checklist.Delete, id),
+    },
   },
 
   stats: {

@@ -1,8 +1,10 @@
 import { ipcMain } from 'electron';
 import { IPC } from '@shared/ipc-channels';
 import type {
+  CreateChecklistInput,
   CreateInterviewInput,
   InterviewResult,
+  UpdateChecklistInput,
   UpdateInterviewInput,
 } from '@shared/types';
 import * as interviewService from '../service/interview.service';
@@ -23,5 +25,18 @@ export function registerInterviewHandlers(): void {
   );
   ipcMain.handle(IPC.Interview.Delete, (_event, id: number) =>
     interviewService.deleteInterview(id),
+  );
+
+  ipcMain.handle(IPC.Interview.Checklist.List, (_event, interviewId: number) =>
+    interviewService.listChecklist(interviewId),
+  );
+  ipcMain.handle(IPC.Interview.Checklist.Create, (_event, input: CreateChecklistInput) =>
+    interviewService.createChecklist(input),
+  );
+  ipcMain.handle(IPC.Interview.Checklist.Update, (_event, input: UpdateChecklistInput) =>
+    interviewService.updateChecklist(input),
+  );
+  ipcMain.handle(IPC.Interview.Checklist.Delete, (_event, id: number) =>
+    interviewService.deleteChecklist(id),
   );
 }

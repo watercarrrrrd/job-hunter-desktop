@@ -24,6 +24,12 @@ export const IPC = {
     Update: 'interview:update',
     UpdateResult: 'interview:update-result',
     Delete: 'interview:delete',
+    Checklist: {
+      List: 'interview:checklist-list',
+      Create: 'interview:checklist-create',
+      Update: 'interview:checklist-update',
+      Delete: 'interview:checklist-delete',
+    },
   },
   Stats: {
     Overview: 'stats:overview',

@@ -225,6 +225,18 @@ export interface UpdateInterviewResultInput {
   review?: string | null;
 }
 
+export interface CreateChecklistInput {
+  interviewId: number;
+  content: string;
+}
+
+export interface UpdateChecklistInput {
+  id: number;
+  content?: string;
+  done?: boolean;
+  sortOrder?: number;
+}
+
 // ---------------------------------------------------------------------------
 // 统一返回结构
 // ---------------------------------------------------------------------------
