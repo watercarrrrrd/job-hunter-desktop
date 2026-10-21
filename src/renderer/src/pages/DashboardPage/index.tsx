@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Chart from '../../components/Chart';
+import EmptyState from '../../components/EmptyState';
 import { useStats } from '../../hooks/useStats';
 import {
   buildChannelBarOption,
@@ -30,14 +31,22 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <h1 className="text-xl font-semibold">统计看板</h1>
+      <h1 className="text-xl font-semibold text-gray-900">统计看板</h1>
 
       {error && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
 
       {loading && !data ? (
-        <p className="mt-4 text-sm text-gray-400">加载中…</p>
+        <div className="mt-4 flex items-center gap-2 text-sm text-gray-400">
+          <span className="spinner text-gray-300" aria-hidden="true" />
+          加载中…
+        </div>
+      ) : data && data.overview.totalApplications === 0 ? (
+        <EmptyState
+          title="暂无统计数据"
+          description="开始添加投递记录后，这里会展示求职进度、渠道分布与转化漏斗。"
+        />
       ) : data ? (
         <div className="mt-4 flex flex-1 flex-col overflow-auto pb-4">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

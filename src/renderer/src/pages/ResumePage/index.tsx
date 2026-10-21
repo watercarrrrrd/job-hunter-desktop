@@ -1,8 +1,11 @@
 import { useRef, useState } from 'react';
 import { RESUME_TEMPLATE_LABELS, RESUME_TEMPLATES } from '@shared/constants';
 import type { Resume, ResumeContent, ResumeTemplateId } from '@shared/types';
+import Button from '../../components/Button';
 import Confirm from '../../components/Confirm';
+import EmptyState from '../../components/EmptyState';
 import Select from '../../components/Select';
+import { useToast } from '../../components/Toast';
 import { useResumes } from '../../hooks/useResumes';
 import { DEFAULT_TEMPLATE, emptyResumeContent } from '../../lib/resume';
 import { exportResumeToPdf } from '../../pdf/resumePdf';
@@ -26,11 +29,14 @@ const TEMPLATE_OPTIONS = RESUME_TEMPLATES.map((t) => ({
 
 export default function ResumePage() {
   const { resumes, loading, error, create, update, remove } = useResumes();
+  const toast = useToast();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [mode, setMode] = useState<Mode>('preview');
   const [draft, setDraft] = useState<Draft | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   // 深拷贝列表项为编辑草稿，避免编辑态直接改动列表对象
@@ -68,6 +74,9 @@ export default function ResumePage() {
         setSelectedId(created.id);
         setDraft(toDraft(created));
         setMode('preview');
+        toast.success('简历已创建');
+      } else {
+        toast.error('保存失败，请重试');
       }
     } else {
       const updated = await update({
@@ -80,6 +89,9 @@ export default function ResumePage() {
         setSelectedId(updated.id);
         setDraft(toDraft(updated));
         setMode('preview');
+        toast.success('简历已保存');
+      } else {
+        toast.error('保存失败，请重试');
       }
     }
     setSaving(false);
@@ -87,27 +99,41 @@ export default function ResumePage() {
 
   async function confirmDelete(): Promise<void> {
     if (deleteId === null) return;
+    setDeleting(true);
     const ok = await remove(deleteId);
-    if (ok && deleteId === selectedId) {
-      setSelectedId(null);
-      setDraft(null);
-      setMode('preview');
-    }
+    setDeleting(false);
     setDeleteId(null);
+    if (ok) {
+      if (deleteId === selectedId) {
+        setSelectedId(null);
+        setDraft(null);
+        setMode('preview');
+      }
+      toast.success('简历已删除');
+    } else {
+      toast.error('删除失败，请重试');
+    }
   }
 
   async function handleExport(): Promise<void> {
-    if (!draft || !previewRef.current) return;
+    if (!draft || !previewRef.current || exporting) return;
+    setExporting(true);
     const fileName = `${draft.name.trim() || '简历'}.pdf`;
-    await exportResumeToPdf(previewRef.current, fileName);
+    const path = await exportResumeToPdf(previewRef.current, fileName);
+    setExporting(false);
+    if (path) {
+      toast.success('PDF 已导出');
+    } else {
+      toast.error('导出失败，请重试');
+    }
   }
 
   const modeBtn = (value: Mode, label: string) => (
     <button
       type="button"
       onClick={() => setMode(value)}
-      className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-        mode === value ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-800'
+      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+        mode === value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'
       }`}
     >
       {label}
@@ -117,18 +143,12 @@ export default function ResumePage() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">简历管理</h1>
-        <button
-          type="button"
-          onClick={handleNew}
-          className="rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
-        >
-          新建简历
-        </button>
+        <h1 className="text-xl font-semibold text-gray-900">简历管理</h1>
+        <Button onClick={handleNew}>新建简历</Button>
       </div>
 
       {error && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
 
       <div className="mt-4 flex flex-1 gap-4 overflow-hidden">
@@ -140,11 +160,11 @@ export default function ResumePage() {
           onDelete={(id) => setDeleteId(id)}
         />
 
-        <div className="flex flex-1 flex-col overflow-hidden rounded-md border border-gray-200 bg-white">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
           {draft ? (
             <>
               <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
-                <div className="flex items-center gap-1 rounded-md bg-gray-100 p-1">
+                <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1">
                   {modeBtn('edit', '编辑')}
                   {modeBtn('preview', '预览')}
                 </div>
@@ -157,30 +177,20 @@ export default function ResumePage() {
                     }
                     options={TEMPLATE_OPTIONS}
                   />
-                  <button
-                    type="button"
-                    onClick={handleExport}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
+                  <Button variant="secondary" onClick={() => void handleExport()} loading={exporting}>
                     导出 PDF
-                  </button>
-                  <button
-                    type="button"
+                  </Button>
+                  <Button
+                    variant="dangerGhost"
                     onClick={() => setDeleteId(draft.id)}
                     disabled={draft.id === null}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:text-gray-300"
                   >
                     删除
-                  </button>
+                  </Button>
                   {mode === 'edit' && (
-                    <button
-                      type="button"
-                      onClick={handleSave}
-                      disabled={saving || !draft.name.trim()}
-                      className="rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-                    >
+                    <Button onClick={() => void handleSave()} disabled={!draft.name.trim()} loading={saving}>
                       {saving ? '保存中…' : '保存'}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -203,9 +213,7 @@ export default function ResumePage() {
               </div>
             </>
           ) : (
-            <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
-              选择左侧简历，或点击「新建简历」开始
-            </div>
+            <EmptyState title="未选择简历" description="从左侧选择一份简历，或点击「新建简历」开始。" />
           )}
         </div>
       </div>
@@ -216,6 +224,7 @@ export default function ResumePage() {
         message="确定删除该简历？此操作不可恢复。"
         confirmText="删除"
         danger
+        loading={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
       />

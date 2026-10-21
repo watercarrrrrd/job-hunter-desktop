@@ -11,6 +11,7 @@ import type {
   Resume,
 } from '@shared/types';
 import DatePicker from '../../components/DatePicker';
+import Button from '../../components/Button';
 import FormField from '../../components/FormField';
 import Input from '../../components/Input';
 import Modal from '../../components/Modal';
@@ -112,21 +113,12 @@ export default function ApplicationFormModal({
       onClose={onClose}
       footer={
         <>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-          >
+          <Button variant="secondary" onClick={onClose} disabled={saving}>
             取消
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!valid || saving}
-            className="rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-          >
+          </Button>
+          <Button onClick={handleSubmit} disabled={!valid || saving} loading={saving}>
             {saving ? '保存中…' : '保存'}
-          </button>
+          </Button>
         </>
       }
     >

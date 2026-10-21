@@ -24,9 +24,9 @@ interface UseInterviewsResult {
   ) => Promise<Interview | null>;
   remove: (id: number) => Promise<boolean>;
   loadChecklist: (interviewId: number) => Promise<void>;
-  addChecklist: (interviewId: number, content: string) => Promise<void>;
-  toggleChecklist: (item: InterviewChecklist) => Promise<void>;
-  removeChecklist: (id: number) => Promise<void>;
+  addChecklist: (interviewId: number, content: string) => Promise<boolean>;
+  toggleChecklist: (item: InterviewChecklist) => Promise<boolean>;
+  removeChecklist: (id: number) => Promise<boolean>;
 }
 
 /** 面试数据 hook：统一解包 ApiResult，维护面试列表与按面试聚合的准备清单 */
@@ -120,39 +120,41 @@ export function useInterviews(): UseInterviewsResult {
   }, []);
 
   const addChecklist = useCallback(
-    async (interviewId: number, content: string): Promise<void> => {
+    async (interviewId: number, content: string): Promise<boolean> => {
       const input: CreateChecklistInput = { interviewId, content };
       const result = await api.interview.checklist.create(input);
       if (!result.ok) {
         setError(result.error);
-        return;
+        return false;
       }
       await loadChecklist(interviewId);
+      return true;
     },
     [loadChecklist],
   );
 
   const toggleChecklist = useCallback(
-    async (item: InterviewChecklist): Promise<void> => {
+    async (item: InterviewChecklist): Promise<boolean> => {
       const result = await api.interview.checklist.update({
         id: item.id,
         done: !item.done,
       });
       if (!result.ok) {
         setError(result.error);
-        return;
+        return false;
       }
       await loadChecklist(item.interviewId);
+      return true;
     },
     [loadChecklist],
   );
 
   const removeChecklist = useCallback(
-    async (id: number): Promise<void> => {
+    async (id: number): Promise<boolean> => {
       const result = await api.interview.checklist.remove(id);
       if (!result.ok) {
         setError(result.error);
-        return;
+        return false;
       }
       // 从聚合中就地移除，避免额外一次整组刷新
       setChecklistByInterview((prev) => {
@@ -162,6 +164,7 @@ export function useInterviews(): UseInterviewsResult {
         }
         return next;
       });
+      return true;
     },
     [],
   );

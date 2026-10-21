@@ -4,6 +4,7 @@ import {
   APPLICATION_STATUSES,
 } from '@shared/constants';
 import type { Application, ApplicationStatus, Resume } from '@shared/types';
+import EmptyState from '../../components/EmptyState';
 import Select from '../../components/Select';
 import StatusTag from '../../components/StatusTag';
 
@@ -30,10 +31,20 @@ export default function ApplicationsTable({
   onStatusChange,
 }: ApplicationsTableProps) {
   if (loading && applications.length === 0) {
-    return <p className="p-4 text-sm text-gray-400">加载中…</p>;
+    return (
+      <div className="flex items-center justify-center gap-2 p-8 text-sm text-gray-400">
+        <span className="spinner text-gray-300" aria-hidden="true" />
+        加载中…
+      </div>
+    );
   }
   if (applications.length === 0) {
-    return <p className="p-4 text-sm text-gray-400">暂无投递记录，点击「新建投递」开始</p>;
+    return (
+      <EmptyState
+        title="暂无投递记录"
+        description="记录每一次投递，随时跟进求职进度。"
+      />
+    );
   }
 
   const resumeName = (id: number | null): string => {
@@ -57,7 +68,7 @@ export default function ApplicationsTable({
       </thead>
       <tbody>
         {applications.map((app) => (
-          <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50">
+          <tr key={app.id} className="border-b border-gray-100 transition-colors hover:bg-gray-50">
             <td className="px-3 py-2 font-medium text-gray-900">{app.company}</td>
             <td className="px-3 py-2 text-gray-700">{app.position}</td>
             <td className="px-3 py-2 text-gray-700">{app.appliedDate ?? '-'}</td>
@@ -83,18 +94,18 @@ export default function ApplicationsTable({
               {app.note ?? '-'}
             </td>
             <td className="px-3 py-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => onEdit(app)}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="rounded-md px-2 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
                 >
                   编辑
                 </button>
                 <button
                   type="button"
                   onClick={() => onDelete(app.id)}
-                  className="text-red-500 hover:text-red-700"
+                  className="rounded-md px-2 py-1 text-sm text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
                 >
                   删除
                 </button>

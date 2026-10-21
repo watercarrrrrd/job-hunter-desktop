@@ -8,6 +8,7 @@ import type {
   InterviewChecklist,
   InterviewResult,
 } from '@shared/types';
+import Button from '../../components/Button';
 import StatusTag from '../../components/StatusTag';
 import { formatDateTime, formatTime } from '../../lib/format';
 import { isUpcoming } from '../../lib/interviews';
@@ -23,7 +24,7 @@ interface InterviewCardProps {
   onToggleExpand: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onAddChecklist: (content: string) => void;
+  onAddChecklist: (content: string) => Promise<boolean>;
   onToggleChecklist: (item: InterviewChecklist) => void;
   onRemoveChecklist: (id: number) => void;
   onSaveReview: (result: InterviewResult, review: string) => void;
@@ -86,24 +87,20 @@ export default function InterviewCard({
               <p className="text-sm text-gray-400">未安排时间</p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onToggleExpand}
-            className="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
-          >
+          <Button size="sm" variant="secondary" onClick={onToggleExpand}>
             {expanded ? '收起' : '展开'}
-          </button>
+          </Button>
           <button
             type="button"
             onClick={onEdit}
-            className="text-sm text-blue-600 hover:text-blue-700"
+            className="rounded-md px-2 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
           >
             编辑
           </button>
           <button
             type="button"
             onClick={onDelete}
-            className="text-sm text-red-500 hover:text-red-700"
+            className="rounded-md px-2 py-1 text-sm text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
           >
             删除
           </button>

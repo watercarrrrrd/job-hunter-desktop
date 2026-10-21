@@ -20,12 +20,16 @@ export default function AppLayout({ activeKey, onNavigate, children }: AppLayout
                 key={item.key}
                 type="button"
                 onClick={() => onNavigate(item.key)}
-                className={
+                aria-current={active ? 'page' : undefined}
+                className={`relative w-full rounded-lg px-3 py-2 text-left text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                   active
-                    ? 'block w-full rounded-md bg-blue-50 px-3 py-2 text-left text-sm font-medium text-blue-600'
-                    : 'block w-full rounded-md px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100'
-                }
+                    ? 'bg-blue-50 font-medium text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200'
+                }`}
               >
+                {active && (
+                  <span className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-blue-600" />
+                )}
                 {item.label}
               </button>
             );

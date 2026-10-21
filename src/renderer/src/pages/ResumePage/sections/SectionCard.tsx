@@ -17,7 +17,7 @@ export default function SectionCard({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-md border border-gray-200 bg-white">
+    <div className="rounded-lg border border-gray-200 bg-white">
       <div className="flex items-center justify-between px-3 py-2">
         <button
           type="button"

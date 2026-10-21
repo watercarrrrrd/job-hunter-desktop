@@ -1,3 +1,4 @@
+import Button from './Button';
 import Modal from './Modal';
 
 interface ConfirmProps {
@@ -7,6 +8,7 @@ interface ConfirmProps {
   confirmText?: string;
   cancelText?: string;
   danger?: boolean;
+  loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -18,6 +20,7 @@ export default function Confirm({
   confirmText = '确定',
   cancelText = '取消',
   danger = false,
+  loading = false,
   onConfirm,
   onCancel,
 }: ConfirmProps) {
@@ -28,24 +31,12 @@ export default function Confirm({
       onClose={onCancel}
       footer={
         <>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-          >
+          <Button variant="secondary" onClick={onCancel} disabled={loading}>
             {cancelText}
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className={
-              danger
-                ? 'rounded-md bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700'
-                : 'rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700'
-            }
-          >
+          </Button>
+          <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm} loading={loading}>
             {confirmText}
-          </button>
+          </Button>
         </>
       }
     >

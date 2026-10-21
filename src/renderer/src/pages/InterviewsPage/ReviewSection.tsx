@@ -4,6 +4,7 @@ import {
   INTERVIEW_RESULTS,
 } from '@shared/constants';
 import type { Interview, InterviewResult } from '@shared/types';
+import Button from '../../components/Button';
 import FormField from '../../components/FormField';
 import Select from '../../components/Select';
 import Textarea from '../../components/Textarea';
@@ -47,14 +48,9 @@ export default function ReviewSection({ interview, saving, onSave }: ReviewSecti
         />
       </FormField>
       <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => onSave(result, review)}
-          disabled={saving}
-          className="rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-        >
+        <Button onClick={() => onSave(result, review)} disabled={saving} loading={saving}>
           {saving ? '保存中…' : '保存复盘'}
-        </button>
+        </Button>
       </div>
     </div>
   );

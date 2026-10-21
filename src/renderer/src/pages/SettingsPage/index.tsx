@@ -28,14 +28,17 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">系统设置</h1>
+      <h1 className="text-xl font-semibold text-gray-900">系统设置</h1>
 
       {error && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
 
       {loading && !info ? (
-        <p className="mt-4 text-sm text-gray-400">加载中…</p>
+        <div className="mt-4 flex items-center gap-2 text-sm text-gray-400">
+          <span className="spinner text-gray-300" aria-hidden="true" />
+          加载中…
+        </div>
       ) : info ? (
         <div className="mt-4 space-y-4">
           <section className="rounded-lg border border-gray-200 bg-white p-4">
@@ -50,7 +53,7 @@ export default function SettingsPage() {
 
           <section className="rounded-lg border border-gray-200 bg-white p-4">
             <h2 className="mb-1 text-sm font-medium text-gray-700">数据存储</h2>
-            <p className="select-all break-all rounded-md bg-gray-50 px-3 py-2 font-mono text-xs text-gray-700">
+            <p className="select-all break-all rounded-lg bg-gray-50 px-3 py-2 font-mono text-xs text-gray-700">
               {info.dbPath}
             </p>
           </section>
